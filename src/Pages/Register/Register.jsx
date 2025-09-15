@@ -38,16 +38,27 @@ export default function Register() {
         headers: { Accept: "application/json" },
       });
 
-      const token = response.data.data.token;
-      setToken(token); // تخزين التوكن في Zustand
-      navigate("/"); // تحويل المستخدم بعد التسجيل
-    } catch (error) {
-      const errors = error.response?.data?.errors;
-      if (errors) {
-        console.error(errors);
+      // 🔹 التحقق من التوكن
+      const token = response.data?.data?.token;
+      if (token) {
+        setToken(token); // تخزين التوكن
+        navigate("/");   // التوجيه للصفحة الرئيسية
       } else {
-        console.error(error.response?.data?.message || error.message);
+        console.error("No token returned from API");
+        alert("Registration succeeded but no token was returned!");
       }
+    } catch (error) {
+      // 🔹 معالجة الأخطاء القادمة من السيرفر
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.errors ||
+        "Registration failed";
+      console.error(message);
+      alert(
+        typeof message === "string"
+          ? message
+          : JSON.stringify(message, null, 2)
+      );
     } finally {
       setSubmitting(false);
     }
@@ -162,7 +173,7 @@ export default function Register() {
                   </div>
 
                   <div className="text-sm mt-4 text-center">
-                    <Link to="/login" className="text-gray-700">
+                    <Link to="/login" className="text-gray-700 hover:underline">
                       Already have an account? Login
                     </Link>
                   </div>

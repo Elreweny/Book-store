@@ -19,17 +19,23 @@ export default function Login() {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      // ارسال بيانات مباشرة كـ JSON بدل FormData
       const response = await axios.post(`${API_URL}auth/login`, values, {
         headers: { Accept: "application/json" },
       });
 
-      const token = response.data.data.token;
-      setToken(token); // تخزين التوكن في Zustand
-      navigate("/"); // توجيه بعد نجاح تسجيل الدخول
+      // 🔹 التأكد إن الـ response راجع فيه token
+      const token = response.data?.data?.token;
+      if (token) {
+        setToken(token); // تخزين التوكن في Zustand + sessionStorage
+        navigate("/");   // توجيه لصفحة الهوم بعد النجاح
+      } else {
+        console.error("No token returned from API");
+      }
     } catch (error) {
-      // عرض الخطأ في console فقط بدون تعقيد setErrors
-      console.error(error.response?.data?.message || error.message);
+      // 🔹 عرض رسالة أو تخزينها لاحقًا (ممكن نربطها بـ Zustand)
+      const message = error.response?.data?.message || "Login failed";
+      console.error(message);
+      alert(message); // مبدئيًا: عرض رسالة خطأ بسيطة
     } finally {
       setSubmitting(false);
     }
@@ -92,13 +98,13 @@ export default function Login() {
                     >
                       {isSubmitting ? "Signing in..." : "Sign In"}
                     </button>
-                    <p className="text-sm text-gray-500 text-center sm:text-right">
+                    <p className="text-sm text-gray-500 text-center sm:text-right cursor-pointer hover:underline">
                       Forgot your password?
                     </p>
                   </div>
 
                   <div className="text-sm mt-4 text-center">
-                    <Link to="/register" className="text-gray-700">
+                    <Link to="/register" className="text-gray-700 hover:underline">
                       Create account
                     </Link>
                   </div>

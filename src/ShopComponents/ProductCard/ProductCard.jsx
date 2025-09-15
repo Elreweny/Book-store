@@ -1,11 +1,37 @@
 import { Link } from "react-router-dom";
 import { FiHeart, FiShoppingCart } from "react-icons/fi";
+import useStore from "../../store/store";
 
 export default function ProductCard({ product }) {
+  // دوال تحديث Cart و Wishlist
+  const addToCartStore = useStore((state) => state.addToCart);
+  const addToWishlistStore = useStore((state) => state.addToWishlist);
+
+  // دوال handle مع try/catch + alert لتأكيد العملية
+  const handleAddToCart = async () => {
+  try {
+    await addToCartStore(product.id);
+    // ❌ شلنا alert
+    // التوستر بيظهر من داخل store.js بالفعل
+  } catch (err) {
+    console.error("Failed to add to cart:", err);
+    // ممكن تخليها toast.error هنا لو حابب
+  }
+};
+
+ const handleAddToWishlist = async () => {
+  try {
+    await addToWishlistStore(product.id);
+    // ❌ شلنا alert
+  } catch (err) {
+    console.error("Failed to add to wishlist:", err);
+  }
+  };
+
   return (
-    <div className="border border-gray-200  shadow hover:shadow-lg transition group min-h-[477px] min-w-[285px]">
+    <div className="border border-gray-200 shadow hover:shadow-lg transition group min-h-[477px] min-w-[285px]">
       {/* Image Wrapper */}
-      <div className="relative bg-white p-12 flex items-center justify-center ">
+      <div className="relative bg-white p-12 flex items-center justify-center">
         <Link to={`/shop/${product.id}`}>
           <div className="h-[337px] w-[253px]">
             <img
@@ -17,11 +43,17 @@ export default function ProductCard({ product }) {
         </Link>
 
         {/* Hover bar (bottom only) */}
-        <div className="absolute bottom-0 w-[253px] h-[52px] bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-evenly  px-4 rounded">
-          <button className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow hover:bg-[#00bfc5]">
+        <div className="absolute bottom-0 w-[253px] h-[52px] bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-evenly px-4 rounded">
+          <button
+            onClick={handleAddToCart}
+            className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow hover:bg-[#00bfc5]"
+          >
             <FiShoppingCart size={18} />
           </button>
-          <button className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow hover:bg-[#00bfc5]">
+          <button
+            onClick={handleAddToWishlist}
+            className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow hover:bg-[#00bfc5]"
+          >
             <FiHeart size={18} />
           </button>
         </div>
@@ -41,11 +73,7 @@ export default function ProductCard({ product }) {
           <span className="text-[#00bfc5] text-[16px] font-bold leading-[22px]">
             {product.price}
           </span>
-          {product.oldPrice && (
-            <span className="text-sm text-gray-400 line-through">
-              {product.oldPrice}
-            </span>
-          )}
+          
         </div>
       </div>
     </div>

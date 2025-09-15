@@ -1,3 +1,4 @@
+// src/Components/Header/Header.jsx
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { SlHandbag } from "react-icons/sl";
@@ -5,7 +6,7 @@ import { VscMenu } from "react-icons/vsc";
 import { BsSearch } from "react-icons/bs";
 import { FiX, FiChevronDown, FiSearch } from "react-icons/fi";
 import { FaAngleDown } from "react-icons/fa";
-import useAuthStore from "../../store/store"; // تأكد من مسار الـstore عندك
+import useStore from "../../store/store";
 
 export default function Header() {
   const [openSidebar, setOpenSidebar] = useState(false);
@@ -14,11 +15,23 @@ export default function Header() {
   const [openShop, setOpenShop] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
 
-  const { token, logout } = useAuthStore();
-  const isLoggedIn = !!token;
+  // ✅ Zustand values
+  const token = useStore((state) => state.token);
+  const logout = useStore((state) => state.logout);
+  const cartCount = useStore((state) => state.cartCount);
+  const fetchCart = useStore((state) => state.fetchCart);
 
+  const isLoggedIn = !!token;
   const navigate = useNavigate();
 
+  // ✅ sync cart on refresh
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchCart();
+    }
+  }, [isLoggedIn, fetchCart]);
+
+  // ✅ handle window resize
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 768);
     window.addEventListener("resize", handleResize);
@@ -32,7 +45,7 @@ export default function Header() {
   const handleLogout = () => {
     logout();
     setOpenSidebar(false);
-    navigate("/"); // ارجع للصفحة الرئيسية بعد logout
+    navigate("/"); // redirect after logout
   };
 
   return (
@@ -117,13 +130,23 @@ export default function Header() {
 
           {/* Right side */}
           <div className="flex items-center gap-8">
-            <button className="hidden md:inline-flex" aria-label="Search">
+            <button
+              className="hidden md:inline-flex"
+              aria-label="Search"
+              onClick={handleSearch}
+            >
               <BsSearch className="text-base hover:text-[#00bfc5]" />
             </button>
 
-            <button aria-label="Cart">
+            {/* Cart with badge */}
+            <Link to="/cart" className="relative" aria-label="Cart">
               <SlHandbag className="text-[18px] hover:text-[#00bfc5]" />
-            </button>
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-[#00bfc5] text-white text-[12px] w-4 h-4 flex items-center justify-center rounded-full">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
 
             <button
               onClick={() => setOpenSidebar(true)}
@@ -165,7 +188,9 @@ export default function Header() {
                 <ul className="space-y-2 font-medium pl-2">
                   {isLoggedIn ? (
                     <li>
-                      <button onClick={handleLogout} className="cursor-pointer">Logout</button>
+                      <button onClick={handleLogout} className="cursor-pointer">
+                        Logout
+                      </button>
                     </li>
                   ) : (
                     <>
@@ -294,7 +319,12 @@ export default function Header() {
                   <ul className="mt-2 space-y-2 text-gray-700 pl-4">
                     {isLoggedIn ? (
                       <li>
-                        <button onClick={handleLogout} className="cursor-pointer">Logout</button>
+                        <button
+                          onClick={handleLogout}
+                          className="cursor-pointer"
+                        >
+                          Logout
+                        </button>
                       </li>
                     ) : (
                       <>
