@@ -73,20 +73,13 @@ export const authAPI = {
 export const wishlistAPI = {
   add: (bookId) => api.post("/wishlist/add", { bookId }),
   get: () => api.get("/wishlist/get"),
-  count: () => api.get("/wishlist/count"),
   remove: (bookId) => api.post("/wishlist/remove", { bookId }),
-
-  // Aliases
-  getAll: () => api.get("/wishlist/get"),
-  getCount: () => api.get("/wishlist/count"),
 };
 
 // Cart API
 export const cartAPI = {
   add: (bookId) => api.post("/cart", { bookId }),
   getAll: () => api.get("/cart"),
-  getCount: () => api.get("/cart/count"),
-  count: () => api.get("/cart/count"),
   remove: (itemId) => api.delete(`/cart/${itemId}`),
   update: (itemId, qty) => api.put(`/cart/${itemId}`, { qty }),
 };

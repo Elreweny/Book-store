@@ -10,6 +10,9 @@ import Login from "../Pages/Login/Login";
 import Register from "../Pages/Register/Register";
 import AuthRedirect from "../Components/AuthRedirect/AuthRedirect";
 import ProductDetails from "../Pages/ProductDetails/ProductDetails";
+import Cart from "../Pages/Cart/Cart";
+import Checkouts from "../Pages/Checkouts/Checkouts";
+import Wishlist from "../Pages/Wishlist/Wishlist";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -24,7 +27,7 @@ const router = createBrowserRouter([
         path: "/shop",
         element: <Shop />,
       },
-      
+
       {
         path: "/blog",
         element: <Blog />,
@@ -37,7 +40,7 @@ const router = createBrowserRouter([
         path: "/contact",
         element: <Contact />,
       },
-       {
+      {
         path: "/login",
         element: (
           <AuthRedirect>
@@ -56,6 +59,18 @@ const router = createBrowserRouter([
       {
         path: "/shop/:id",
         element: <ProductDetails />,
+      },
+      {
+        path: "/cart",
+        element: <Cart />,
+      },
+      {
+        path: "/checkout",
+        element: <Checkouts />,
+      },
+      {
+        path: "/wishlist",
+        element: <Wishlist />,
       },
     ],
   },

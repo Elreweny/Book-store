@@ -3,33 +3,35 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { SlHandbag } from "react-icons/sl";
 import { VscMenu } from "react-icons/vsc";
-import { BsSearch } from "react-icons/bs";
+import { FiHeart } from "react-icons/fi";
+
 import { FiX, FiChevronDown, FiSearch } from "react-icons/fi";
-import { FaAngleDown } from "react-icons/fa";
 import useStore from "../../store/store";
 
 export default function Header() {
   const [openSidebar, setOpenSidebar] = useState(false);
   const [openAccount, setOpenAccount] = useState(false);
   const [openCurrency, setOpenCurrency] = useState(false);
-  const [openShop, setOpenShop] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
 
   // ✅ Zustand values
   const token = useStore((state) => state.token);
   const logout = useStore((state) => state.logout);
   const cartCount = useStore((state) => state.cartCount);
+  const wishlistCount = useStore((state) => state.wishlistCount); // ✅ جديد
   const fetchCart = useStore((state) => state.fetchCart);
+  const fetchWishlist = useStore((state) => state.fetchWishlist); // ✅ جديد
 
   const isLoggedIn = !!token;
   const navigate = useNavigate();
 
-  // ✅ sync cart on refresh
+  // ✅ sync cart + wishlist on refresh
   useEffect(() => {
     if (isLoggedIn) {
       fetchCart();
+      fetchWishlist();
     }
-  }, [isLoggedIn, fetchCart]);
+  }, [isLoggedIn, fetchCart, fetchWishlist]);
 
   // ✅ handle window resize
   useEffect(() => {
@@ -37,10 +39,6 @@ export default function Header() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  const handleSearch = () => {
-    console.log("Search clicked");
-  };
 
   const handleLogout = () => {
     logout();
@@ -78,27 +76,13 @@ export default function Header() {
                     Home
                   </Link>
                 </li>
-                <li className="relative group">
+                <li>
                   <Link
                     to="/shop"
-                    className="hover:text-[#00bfc5] font-semibold leading-[55px] uppercase text-[14px] flex items-center"
+                    className="hover:text-[#00bfc5] font-semibold leading-[55px] uppercase text-[14px]"
                   >
-                    Shop <FaAngleDown className="ml-1" />
+                    Shop
                   </Link>
-                  <div className="absolute top-full left-0 mt-2 hidden group-hover:block bg-white shadow-md rounded-md p-3 space-y-2 min-w-[180px] z-20">
-                    <Link
-                      to="/shop"
-                      className="block hover:text-[#00bfc5] font-semibold uppercase text-[14px]"
-                    >
-                      All Products
-                    </Link>
-                    <Link
-                      to="/shop/new"
-                      className="block hover:text-[#00bfc5] font-semibold uppercase text-[14px]"
-                    >
-                      New Arrivals
-                    </Link>
-                  </div>
                 </li>
                 <li>
                   <Link
@@ -130,13 +114,15 @@ export default function Header() {
 
           {/* Right side */}
           <div className="flex items-center gap-8">
-            <button
-              className="hidden md:inline-flex"
-              aria-label="Search"
-              onClick={handleSearch}
-            >
-              <BsSearch className="text-base hover:text-[#00bfc5]" />
-            </button>
+            {/* Wishlist with badge */}
+            <Link to="/wishlist" className="relative" aria-label="Wishlist">
+              <FiHeart className="text-[18px] hover:text-[#00bfc5]" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-[#00bfc5] text-white text-[12px] w-4 h-4 flex items-center justify-center rounded-full">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
 
             {/* Cart with badge */}
             <Link to="/cart" className="relative" aria-label="Cart">
@@ -235,7 +221,6 @@ export default function Header() {
                   className="w-full p-2 pr-10 bg-gray-200 border-0 focus:outline-none focus:border-0"
                 />
                 <button
-                  onClick={handleSearch}
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
                   aria-label="Search"
                 >
@@ -250,39 +235,9 @@ export default function Header() {
                   </Link>
                 </li>
                 <li>
-                  <div className="flex justify-between items-center font-bold">
-                    <Link to="/shop" onClick={() => setOpenSidebar(false)}>
-                      Shop
-                    </Link>
-                    <button
-                      onClick={() => setOpenShop(!openShop)}
-                      className="ml-2"
-                      aria-expanded={openShop}
-                    >
-                      <FiChevronDown
-                        className={`transition-transform ${
-                          openShop ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-                  </div>
-                  {openShop && (
-                    <ul className="mt-2 space-y-2 text-gray-700 pl-4">
-                      <li>
-                        <Link to="/shop" onClick={() => setOpenSidebar(false)}>
-                          All Products
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/shop/new"
-                          onClick={() => setOpenSidebar(false)}
-                        >
-                          New Arrivals
-                        </Link>
-                      </li>
-                    </ul>
-                  )}
+                  <Link to="/shop" onClick={() => setOpenSidebar(false)}>
+                    Shop
+                  </Link>
                 </li>
                 <li>
                   <Link to="/blog" onClick={() => setOpenSidebar(false)}>

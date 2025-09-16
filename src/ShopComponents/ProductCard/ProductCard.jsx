@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { FiHeart, FiShoppingCart } from "react-icons/fi";
+import { FiHeart } from "react-icons/fi";
+import { SlHandbag } from "react-icons/sl";
 import useStore from "../../store/store";
 
 export default function ProductCard({ product }) {
@@ -9,23 +10,23 @@ export default function ProductCard({ product }) {
 
   // دوال handle مع try/catch + alert لتأكيد العملية
   const handleAddToCart = async () => {
-  try {
-    await addToCartStore(product.id);
-    // ❌ شلنا alert
-    // التوستر بيظهر من داخل store.js بالفعل
-  } catch (err) {
-    console.error("Failed to add to cart:", err);
-    // ممكن تخليها toast.error هنا لو حابب
-  }
-};
+    try {
+      await addToCartStore(product.id);
+      // ❌ شلنا alert
+      // التوستر بيظهر من داخل store.js بالفعل
+    } catch (err) {
+      console.error("Failed to add to cart:", err);
+      // ممكن تخليها toast.error هنا لو حابب
+    }
+  };
 
- const handleAddToWishlist = async () => {
-  try {
-    await addToWishlistStore(product.id);
-    // ❌ شلنا alert
-  } catch (err) {
-    console.error("Failed to add to wishlist:", err);
-  }
+  const handleAddToWishlist = async () => {
+    try {
+      await addToWishlistStore(product.id);
+      // ❌ شلنا alert
+    } catch (err) {
+      console.error("Failed to add to wishlist:", err);
+    }
   };
 
   return (
@@ -48,7 +49,7 @@ export default function ProductCard({ product }) {
             onClick={handleAddToCart}
             className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow hover:bg-[#00bfc5]"
           >
-            <FiShoppingCart size={18} />
+            <SlHandbag size={18} />
           </button>
           <button
             onClick={handleAddToWishlist}
@@ -73,7 +74,6 @@ export default function ProductCard({ product }) {
           <span className="text-[#00bfc5] text-[16px] font-bold leading-[22px]">
             {product.price}
           </span>
-          
         </div>
       </div>
     </div>

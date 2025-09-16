@@ -1,6 +1,5 @@
 import { RouterProvider } from "react-router-dom";
-import { Toaster } from "react-hot-toast"; // 👈 استدعاء Toaster
-import "./App.css";
+import { Toaster } from "react-hot-toast"; 
 import router from "./Routes/Routes";
 
 function App() {

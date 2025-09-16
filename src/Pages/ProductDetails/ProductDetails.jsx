@@ -1,6 +1,6 @@
 // src/Pages/ProductDetails/ProductDetails.jsx
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { booksAPI } from "../../services/apiService";
 import useStore from "../../store/store";
 import IntroSection from "../../Components/IntroSection/IntroSection";
@@ -54,8 +54,6 @@ export default function ProductDetails() {
     setQuantity((prev) => Math.max(1, prev + amount));
   };
 
- 
-
   const handleAddToWishlist = async () => {
     if (!product) return;
     try {
@@ -73,7 +71,6 @@ export default function ProductDetails() {
   const handleAddToCart = async () => {
     if (!product) return;
     try {
-      // if your API supports qty, update addToCart to accept qty; for now call with id
       await addToCart(product.id);
       setMessage("Product added to cart.");
       setTimeout(() => setMessage(""), 2500);
@@ -87,75 +84,73 @@ export default function ProductDetails() {
   if (loading)
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-xl">Loading...</div>
+        <div className="text-lg sm:text-xl">Loading...</div>
       </div>
     );
 
   if (error)
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-xl text-red-600">{error}</div>
+        <div className="text-lg sm:text-xl text-red-600">{error}</div>
       </div>
     );
 
   if (!product)
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-xl">Product not found</div>
+        <div className="text-lg sm:text-xl">Product not found</div>
       </div>
     );
 
   return (
     <>
       <IntroSection />
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* العنوان الرئيسي */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            HISTORY OF MOON VOL-1
-          </h1>
-          <h2 className="text-xl text-gray-600 mt-2">BH PRODUCTION</h2>
-          <div className="border-t border-gray-300 my-6"></div>
-        </div>
-
+      {/* نفس مقاسات النافبار بالظبط */}
+      <div className="max-w-screen-xl mx-auto px-[1rem] sm:px-[2rem] md:px-[3rem] lg:px-[5rem] py-8">
         {message && (
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="mb-4 p-2 bg-green-100 text-green-800 rounded">{message}</div>
+          <div className="mb-4 p-2 bg-green-100 text-green-800 rounded text-sm sm:text-base">
+            {message}
           </div>
         )}
 
         <div className="flex flex-col lg:flex-row gap-10">
-          {/* قسم الوسائط (الفيديو) */}
-          <div className="lg:w-1/2">
-            <div className="bg-gray-200 h-80 rounded-lg flex items-center justify-center border border-gray-300">
-              <span className="text-gray-500 text-lg">ڤيديو المنتج</span>
+          {/* قسم الصوره */}
+          <div className="w-full lg:w-1/2 flex justify-center items-center">
+            <div
+              className="w-full h-[300px] sm:h-[400px] lg:h-auto overflow-hidden rounded-lg 
+                  transition-shadow duration-300 ease-in-out 
+                  hover:shadow-[0_10px_20px_rgba(0,191,197,0.5)]"
+            >
+              <img
+                src={product.image}
+                alt={product.title}
+                className="w-full h-full object-contain transition-transform duration-300 ease-in-out transform hover:scale-105"
+              />
             </div>
           </div>
 
           {/* قسم معلومات المنتج */}
           <div className="lg:w-1/2">
             {/* العنوان والسعر */}
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-xl font-semibold text-gray-900">
+            <div className="items-start mb-4">
+              <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900">
                 {product.id}. {product.title}
               </h3>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-base sm:text-lg md:text-xl font-bold text-[#00bfc5] ">
                 {product.price}
               </p>
             </div>
 
-           
-
             {/* الوصف */}
-            <p className="text-gray-600 mb-6">
+            <p className="text-sm sm:text-base text-gray-600 mb-6">
               {product.description || "No description available."}
             </p>
 
             {/* جدول التفاصيل */}
             <div className="mb-6">
-              <table className="w-full">
+              <table className="w-full text-sm sm:text-base">
                 <tbody>
-                  <tr className="border-b border-gray-200">
+                  <tr className="border border-gray-200">
                     <td className="py-2 font-semibold text-gray-700">
                       Book Name:
                     </td>
@@ -163,7 +158,7 @@ export default function ProductDetails() {
                       {product.id}. {product.title}
                     </td>
                   </tr>
-                  <tr className="border-b border-gray-200">
+                  <tr className="border border-gray-200">
                     <td className="py-2 font-semibold text-gray-700">
                       Author Name
                     </td>
@@ -171,15 +166,13 @@ export default function ProductDetails() {
                       {product.author?.name || "Unknown"}
                     </td>
                   </tr>
-                  <tr className="border-b border-gray-200">
+                  <tr className="border border-gray-200">
                     <td className="py-2 font-semibold text-gray-700">
                       Product Type
                     </td>
-                    <td className="py-2 text-gray-900">
-                      {product.category}
-                    </td>
+                    <td className="py-2 text-gray-900">{product.category}</td>
                   </tr>
-                  <tr>
+                  <tr className="border border-gray-200">
                     <td className="py-2 font-semibold text-gray-700">
                       Item Publish Date
                     </td>
@@ -191,58 +184,69 @@ export default function ProductDetails() {
               </table>
             </div>
 
-           
-
             {/* اختيار الكمية */}
-            <div className="flex items-center gap-4 mb-6">
-              <p className="font-semibold text-gray-700">Qty</p>
-              <div className="flex items-center border border-gray-300 rounded-md">
-                <button
-                  className="px-3 py-1 text-gray-600 hover:bg-gray-100"
-                  onClick={() => handleQuantityChange(-1)}
-                >
-                  -
-                </button>
-                <span className="px-4 py-1">{quantity}</span>
-                <button
-                  className="px-3 py-1 text-gray-600 hover:bg-gray-100"
-                  onClick={() => handleQuantityChange(1)}
-                >
-                  +
-                </button>
+            <div className="flex flex-wrap items-center gap-4 mb-6">
+              {/* اختيار الكمية */}
+              <div className="flex items-center gap-2">
+                <p className="font-semibold text-gray-700 text-sm sm:text-base">
+                  Qty
+                </p>
+                <div className="flex items-center border border-gray-300 rounded-md">
+                  <button
+                    className="px-3 py-1 text-gray-600 hover:bg-gray-100"
+                    onClick={() => handleQuantityChange(-1)}
+                  >
+                    -
+                  </button>
+                  <span className="px-4 py-1">{quantity}</span>
+                  <button
+                    className="px-3 py-1 text-gray-600 hover:bg-gray-100"
+                    onClick={() => handleQuantityChange(1)}
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* أزرار الإجراءات */}
-            <div className="flex items-center gap-4 mb-6">
+              {/* زر Add to Cart */}
               <button
-                className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                className="bg-white text-[#00bfc5] border border-[#00bfc5] px-5 sm:px-6 py-2 rounded-md text-sm sm:text-base hover:text-black hover:border-black transition-colors"
                 onClick={handleAddToCart}
               >
                 Add to cart
               </button>
+
+              {/* أزرار Wishlist و Remove */}
               <div className="flex gap-2">
                 <button
                   aria-pressed={isInWishlist}
                   onClick={handleAddToWishlist}
-                  className={`w-8 h-8 flex items-center justify-center rounded-full cursor-pointer ${
-                    isInWishlist ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-600"
+                  className={`w-8 h-8 flex items-center justify-center rounded-full cursor-pointer text-sm sm:text-base ${
+                    isInWishlist
+                      ? "bg-white text-[#00bfc5]"
+                      : "bg-gray-100 text-gray-600"
                   }`}
                 >
                   {isInWishlist ? "✔" : "♡"}
                 </button>
-                <button className="w-8 h-8 flex items-center justify-center bg-red-100 text-red-600 rounded-full cursor-pointer">
+                <button className="w-8 h-8 flex items-center justify-center bg-red-100 text-red-600 rounded-full cursor-pointer text-sm sm:text-base">
                   ✘
                 </button>
               </div>
             </div>
 
-            <div className="border-t border-gray-300 my-6"></div>
-
             {/* قسم الشراء المباشر */}
-            <div>
-              <h3 className="font-semibold text-gray-900 text-lg mb-2">Buy it now</h3>
-              <p className="text-gray-600 italic">Town blank name: nish; numbe: rdoke</p>
+            <div className="mt-4">
+              <Link
+                to="/checkout"
+                className="block w-3/4 text-center text-white bg-black border px-6 sm:px-7 text-base sm:text-lg py-3 rounded-md 
+               hover:bg-white hover:text-[#00bfc5] hover:border-[#00bfc5] transition-colors"
+              >
+                Buy it now
+              </Link>
+              <p className="text-gray-600 italic mt-2 text-xs sm:text-sm">
+                Town blank name: nish; numbe: rdoke
+              </p>
             </div>
           </div>
         </div>

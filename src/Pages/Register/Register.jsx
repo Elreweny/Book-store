@@ -173,7 +173,7 @@ export default function Register() {
                   </div>
 
                   <div className="text-sm mt-4 text-center">
-                    <Link to="/login" className="text-gray-700 hover:underline">
+                    <Link to="/login" className="text-[#00bfc5] hover:underline">
                       Already have an account? Login
                     </Link>
                   </div>

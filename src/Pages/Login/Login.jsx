@@ -104,7 +104,7 @@ export default function Login() {
                   </div>
 
                   <div className="text-sm mt-4 text-center">
-                    <Link to="/register" className="text-gray-700 hover:underline">
+                    <Link to="/register" className="text-[#00bfc5] hover:underline">
                       Create account
                     </Link>
                   </div>

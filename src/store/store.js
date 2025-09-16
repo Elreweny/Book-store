@@ -12,18 +12,15 @@ const useStore = create((set, get) => ({
     if (token) {
       sessionStorage.setItem("token", token);
       set({ token, isLoggedIn: true });
-      // ✅ no toast here
     } else {
       sessionStorage.removeItem("token");
       set({ token: null, isLoggedIn: false });
-      // ✅ no toast here
     }
   },
 
   logout: () => {
     sessionStorage.removeItem("token");
     set({ token: null, isLoggedIn: false });
-    // ✅ no toast here
   },
 
   // 🔹 Products
@@ -42,6 +39,7 @@ const useStore = create((set, get) => ({
 
   // 🔹 Fetch single product
   fetchBook: async (id) => {
+    if (!id) return;
     set({ loading: true, error: null });
     try {
       const response = await booksAPI.getById(id);
@@ -51,7 +49,7 @@ const useStore = create((set, get) => ({
         error: error.response?.data?.message || "Error loading product",
         loading: false,
       });
-      toast.error("Failed to load product ❌");
+      toast.error(error.response?.data?.message || "Failed to load product ❌");
     }
   },
 
@@ -66,7 +64,7 @@ const useStore = create((set, get) => ({
         error: error.response?.data?.message || "Error loading products",
         loading: false,
       });
-      toast.error("Failed to load products ❌");
+      toast.error(error.response?.data?.message || "Failed to load products ❌");
     }
   },
 
@@ -74,7 +72,7 @@ const useStore = create((set, get) => ({
   fetchCart: async () => {
     try {
       const response = await cartAPI.getAll();
-      const items = response.data.data;
+      const items = response.data.data || [];
 
       const totalCount = items.reduce(
         (sum, item) => sum + Number(item.qty ?? 1),
@@ -85,38 +83,46 @@ const useStore = create((set, get) => ({
         cart: items,
         cartCount: totalCount,
       });
-    } catch {
-      toast.error("Failed to load cart ❌");
+    } catch (error) {
+      // مفيش توست هنا، نخلي السيرفر هو اللي يرد
+      set({ cart: [], cartCount: 0 });
     }
   },
 
   addToCart: async (bookId) => {
+    if (!bookId) return;
     try {
       await cartAPI.add(bookId);
       await get().fetchCart();
       toast.success("Product added to cart 🛒");
-    } catch {
-      toast.error("Failed to add product ❌");
+    } catch (error) {
+     
     }
   },
 
   updateCartItem: async (itemId, qty) => {
+    if (!itemId) return;
     try {
       await cartAPI.update(itemId, qty);
       await get().fetchCart();
       toast.success("Quantity updated ✏️");
-    } catch {
-      toast.error("Failed to update quantity ❌");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to update quantity ❌"
+      );
     }
   },
 
   removeFromCart: async (itemId) => {
+    if (!itemId) return;
     try {
       await cartAPI.remove(itemId);
       await get().fetchCart();
       toast.success("Product removed from cart 🗑️");
-    } catch {
-      toast.error("Failed to remove product ❌");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to remove product ❌"
+      );
     }
   },
 
@@ -124,33 +130,40 @@ const useStore = create((set, get) => ({
   fetchWishlist: async () => {
     try {
       const response = await wishlistAPI.get();
-      const countResponse = await wishlistAPI.count();
+      const items = response.data.data || [];
+      const count = response.data.count ?? items.length;
       set({
-        wishlist: response.data.data,
-        wishlistCount: countResponse.data.count,
+        wishlist: items,
+        wishlistCount: count,
       });
-    } catch {
-      toast.error("Failed to load wishlist ❌");
+    } catch (error) {
+      set({ wishlist: [], wishlistCount: 0 });
+      // نخلي السيرفر يدي الرسالة لو موجودة
     }
   },
 
   addToWishlist: async (bookId) => {
+    if (!bookId) return;
     try {
       await wishlistAPI.add(bookId);
       await get().fetchWishlist();
       toast.success("Product added to wishlist ❤️");
-    } catch {
-      toast.error("Failed to add product to wishlist ❌");
+    } catch (error) {
+     
     }
   },
 
   removeFromWishlist: async (bookId) => {
+    if (!bookId) return;
     try {
       await wishlistAPI.remove(bookId);
       await get().fetchWishlist();
       toast.success("Product removed from wishlist 💔");
-    } catch {
-      toast.error("Failed to remove product from wishlist ❌");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to remove product from wishlist ❌"
+      );
     }
   },
 }));
