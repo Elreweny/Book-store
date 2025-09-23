@@ -1,7 +1,7 @@
 // src/Pages/Register/Register.jsx
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import useAuthStore from "../../store/store";
+import useStore from "../../store/store";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import IntroSection from "../../Components/IntroSection/IntroSection";
@@ -22,7 +22,7 @@ const RegisterSchema = Yup.object().shape({
 });
 
 export default function Register() {
-  const setToken = useAuthStore((state) => state.setToken);
+  const setToken = useStore((state) => state.setToken);
   const navigate = useNavigate();
 
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -38,17 +38,16 @@ export default function Register() {
         headers: { Accept: "application/json" },
       });
 
-      // 🔹 التحقق من التوكن
+      // ✅ استخراج التوكن من الاستجابة حسب شكلها
       const token = response.data?.data?.token;
       if (token) {
-        setToken(token); // تخزين التوكن
-        navigate("/");   // التوجيه للصفحة الرئيسية
+        setToken(token); // ✅ تخزين التوكن في Zustand + sessionStorage
+        navigate("/");   // ✅ توجيه المستخدم بعد التسجيل
       } else {
         console.error("No token returned from API");
         alert("Registration succeeded but no token was returned!");
       }
     } catch (error) {
-      // 🔹 معالجة الأخطاء القادمة من السيرفر
       const message =
         error.response?.data?.message ||
         error.response?.data?.errors ||

@@ -1,4 +1,3 @@
-// src/Pages/ProductDetails/ProductDetails.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { booksAPI } from "../../services/apiService";
@@ -14,9 +13,9 @@ export default function ProductDetails() {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [message, setMessage] = useState("");
 
-  // store actions/state
   const addToCart = useStore((s) => s.addToCart);
   const addToWishlist = useStore((s) => s.addToWishlist);
+  const removeFromWishlist = useStore((s) => s.removeFromWishlist);
   const wishlist = useStore((s) => s.wishlist);
 
   useEffect(() => {
@@ -36,7 +35,6 @@ export default function ProductDetails() {
     fetchProduct();
   }, [id]);
 
-  // keep isInWishlist in sync with store.wishlist and loaded product
   useEffect(() => {
     if (!product) return;
     const inList =
@@ -57,7 +55,7 @@ export default function ProductDetails() {
   const handleAddToWishlist = async () => {
     if (!product) return;
     try {
-      await addToWishlist(product.id);
+      await addToWishlist(product);
       setIsInWishlist(true);
       setMessage("Added to wishlist.");
       setTimeout(() => setMessage(""), 2500);
@@ -68,10 +66,24 @@ export default function ProductDetails() {
     }
   };
 
+  const handleRemoveFromWishlist = async () => {
+    if (!product) return;
+    try {
+      await removeFromWishlist(product.id);
+      setIsInWishlist(false);
+      setMessage("Removed from wishlist.");
+      setTimeout(() => setMessage(""), 2500);
+    } catch (err) {
+      console.error("Failed to remove from wishlist:", err);
+      setMessage("Failed to remove from wishlist.");
+      setTimeout(() => setMessage(""), 3000);
+    }
+  };
+
   const handleAddToCart = async () => {
     if (!product) return;
     try {
-      await addToCart(product.id);
+      await addToCart(product);
       setMessage("Product added to cart.");
       setTimeout(() => setMessage(""), 2500);
     } catch (err) {
@@ -105,7 +117,6 @@ export default function ProductDetails() {
   return (
     <>
       <IntroSection />
-      {/* نفس مقاسات النافبار بالظبط */}
       <div className="max-w-screen-xl mx-auto px-[1rem] sm:px-[2rem] md:px-[3rem] lg:px-[5rem] py-8">
         {message && (
           <div className="mb-4 p-2 bg-green-100 text-green-800 rounded text-sm sm:text-base">
@@ -114,24 +125,17 @@ export default function ProductDetails() {
         )}
 
         <div className="flex flex-col lg:flex-row gap-10">
-          {/* قسم الصوره */}
           <div className="w-full lg:w-1/2 flex justify-center items-center">
-            <div
-              className="w-full h-[300px] sm:h-[400px] lg:h-auto overflow-hidden rounded-lg 
-                  transition-shadow duration-300 ease-in-out 
-                  hover:shadow-[0_10px_20px_rgba(0,191,197,0.5)]"
-            >
+            <div className="w-full h-[300px] sm:h-[400px] lg:h-auto overflow-hidden rounded-lg hover:shadow-[0_10px_20px_rgba(0,191,197,0.5)]">
               <img
                 src={product.image}
                 alt={product.title}
-                className="w-full h-full object-contain transition-transform duration-300 ease-in-out transform hover:scale-105"
+                className="w-full h-full object-contain transform hover:scale-105 transition-transform duration-300 ease-in-out"
               />
             </div>
           </div>
 
-          {/* قسم معلومات المنتج */}
           <div className="lg:w-1/2">
-            {/* العنوان والسعر */}
             <div className="items-start mb-4">
               <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900">
                 {product.id}. {product.title}
@@ -141,12 +145,10 @@ export default function ProductDetails() {
               </p>
             </div>
 
-            {/* الوصف */}
             <p className="text-sm sm:text-base text-gray-600 mb-6">
               {product.description || "No description available."}
             </p>
 
-            {/* جدول التفاصيل */}
             <div className="mb-6">
               <table className="w-full text-sm sm:text-base">
                 <tbody>
@@ -184,9 +186,7 @@ export default function ProductDetails() {
               </table>
             </div>
 
-            {/* اختيار الكمية */}
             <div className="flex flex-wrap items-center gap-4 mb-6">
-              {/* اختيار الكمية */}
               <div className="flex items-center gap-2">
                 <p className="font-semibold text-gray-700 text-sm sm:text-base">
                   Qty
@@ -208,7 +208,6 @@ export default function ProductDetails() {
                 </div>
               </div>
 
-              {/* زر Add to Cart */}
               <button
                 className="bg-white text-[#00bfc5] border border-[#00bfc5] px-5 sm:px-6 py-2 rounded-md text-sm sm:text-base hover:text-black hover:border-black transition-colors"
                 onClick={handleAddToCart}
@@ -216,7 +215,6 @@ export default function ProductDetails() {
                 Add to cart
               </button>
 
-              {/* أزرار Wishlist و Remove */}
               <div className="flex gap-2">
                 <button
                   aria-pressed={isInWishlist}
@@ -229,18 +227,19 @@ export default function ProductDetails() {
                 >
                   {isInWishlist ? "✔" : "♡"}
                 </button>
-                <button className="w-8 h-8 flex items-center justify-center bg-red-100 text-red-600 rounded-full cursor-pointer text-sm sm:text-base">
+                <button
+                  onClick={handleRemoveFromWishlist}
+                  className="w-8 h-8 flex items-center justify-center bg-red-100 text-red-600 rounded-full cursor-pointer text-sm sm:text-base"
+                >
                   ✘
                 </button>
               </div>
             </div>
 
-            {/* قسم الشراء المباشر */}
             <div className="mt-4">
               <Link
                 to="/checkout"
-                className="block w-3/4 text-center text-white bg-black border px-6 sm:px-7 text-base sm:text-lg py-3 rounded-md 
-               hover:bg-white hover:text-[#00bfc5] hover:border-[#00bfc5] transition-colors"
+                className="block w-3/4 text-center text-white bg-black border px-6 sm:px-7 text-base sm:text-lg py-3 rounded-md hover:bg-white hover:text-[#00bfc5] hover:border-[#00bfc5] transition-colors"
               >
                 Buy it now
               </Link>

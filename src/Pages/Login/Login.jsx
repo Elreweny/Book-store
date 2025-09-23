@@ -1,7 +1,7 @@
 // src/Pages/Login/Login.jsx
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import useAuthStore from "../../store/store";
+import useStore from "../../store/store";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import IntroSection from "../../Components/IntroSection/IntroSection";
@@ -14,7 +14,7 @@ const LoginSchema = Yup.object().shape({
 });
 
 export default function Login() {
-  const setToken = useAuthStore((state) => state.setToken);
+  const setToken = useStore((state) => state.setToken);
   const navigate = useNavigate();
 
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -23,19 +23,19 @@ export default function Login() {
         headers: { Accept: "application/json" },
       });
 
-      // 🔹 التأكد إن الـ response راجع فيه token
+      // ✅ استخراج التوكن من الاستجابة حسب شكلها
       const token = response.data?.data?.token;
       if (token) {
-        setToken(token); // تخزين التوكن في Zustand + sessionStorage
-        navigate("/");   // توجيه لصفحة الهوم بعد النجاح
+        setToken(token); // ✅ تخزين التوكن في Zustand + sessionStorage
+        navigate("/");   // ✅ توجيه المستخدم بعد تسجيل الدخول
       } else {
         console.error("No token returned from API");
+        alert("Login failed: No token received");
       }
     } catch (error) {
-      // 🔹 عرض رسالة أو تخزينها لاحقًا (ممكن نربطها بـ Zustand)
       const message = error.response?.data?.message || "Login failed";
       console.error(message);
-      alert(message); // مبدئيًا: عرض رسالة خطأ بسيطة
+      alert(message);
     } finally {
       setSubmitting(false);
     }
