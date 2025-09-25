@@ -96,7 +96,7 @@ export default function ProductCard({ product }) {
 
         <div className="flex items-center gap-2 mt-2">
           <span className="text-[#00bfc5] text-[15px] font-bold leading-[20px]">
-           {product.price}
+            {product.price}
           </span>
         </div>
       </div>

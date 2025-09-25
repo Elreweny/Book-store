@@ -12,6 +12,8 @@ export default function IntroSection() {
     shop: "Products",
     login:"Account",
     register:"Create Account",
+    wishlist:"Your Wishlist",
+    cart:"Your Shopping Cart"
   };
   const pageTitle = titles[path] || "Page";
 

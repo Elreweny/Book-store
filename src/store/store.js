@@ -17,10 +17,12 @@ const useStore = create((set, get) => ({
     }
   },
 
-  logout: () => {
-    sessionStorage.removeItem("token");
-    set({ token: null, isLoggedIn: false });
-  },
+ logout: () => {
+  sessionStorage.removeItem("token");
+  set({ token: null, isLoggedIn: false });
+  window.location.reload(); 
+},
+
 
   // 🔹 Products
   books: [],
@@ -74,32 +76,34 @@ const useStore = create((set, get) => ({
       const mappedItems = await Promise.all(
         items.map(async (item) => {
           const bookId = item.bookId;
-          if (!bookId) return null;
+          let bookData = {};
 
           try {
-            const bookRes = await booksAPI.getById(bookId);
-            const book = bookRes.data.data;
-
-            return {
-              cartItemId: item.cartId,
-              productId: bookId,
-              id: bookId,
-              book_id: bookId,
-              book: book,
-              title: book.title || "No title",
-              image: book.image || "/placeholder.png",
-              price: Number(book.price) || Number(item.price) || 0,
-              qty: Number(item.qty) || 1,
-            };
+            const bookResponse = await booksAPI.getById(bookId);
+            bookData = bookResponse.data.data || {};
           } catch {
-            return null;
+            bookData = {};
           }
+
+          return {
+            cartItemId: item.cartId,
+            productId: bookId,
+            id: bookId,
+            book_id: bookId,
+            book: bookData,
+            title: bookData.title ?? "No title",
+            image: bookData.image ?? "/placeholder.png",
+            price:
+              Number(item.price?.toString().replace(/[^\d.]/g, "")) ||
+              Number(bookData.price?.toString().replace(/[^\d.]/g, "")) ||
+              0,
+            qty: Number(item.qty) || 1,
+          };
         })
       );
 
-      const validItems = mappedItems.filter(Boolean);
-      const totalCount = validItems.reduce((sum, item) => sum + item.qty, 0);
-      set({ cart: validItems, cartCount: totalCount, cartLoaded: true });
+      const totalCount = mappedItems.reduce((sum, item) => sum + item.qty, 0);
+      set({ cart: mappedItems, cartCount: totalCount, cartLoaded: true });
     } catch {
       set({ cart: [], cartCount: 0, cartLoaded: true });
     }
@@ -112,8 +116,21 @@ const useStore = create((set, get) => ({
     const exists = cart.some((item) => item.productId === productId);
     if (exists) return;
 
+    const preparedProduct = {
+      book: product.book || {},
+      id: productId,
+      title: product.title ?? product.book?.title ?? "No title",
+      image: product.image ?? product.book?.image ?? "/placeholder.png",
+      price:
+        Number(
+          (product.price ?? product.book?.price)
+            ?.toString()
+            .replace(/[^\d.]/g, "")
+        ) || 0,
+    };
+
     try {
-      await cartAPI.add(productId);
+      await cartAPI.add(preparedProduct);
       await get().fetchCart();
       toast.success("Product added to cart 🛒");
     } catch (error) {
@@ -164,8 +181,15 @@ const useStore = create((set, get) => ({
     }
   },
 
-  clearCart: () => {
-    set({ cart: [], cartCount: 0 });
+  clearCart: async () => {
+    const cart = get().cart;
+    try {
+      for (const item of cart) {
+        await get().removeFromCart(item.productId);
+      }
+    } catch (error) {
+      toast.error("Failed to clear cart ❌");
+    }
   },
 
   // 🔹 Wishlist
@@ -188,9 +212,16 @@ const useStore = create((set, get) => ({
           id: bookId,
           book_id: bookId,
           book: book,
-          title: book.title || "No title",
-          image: book.image || "/placeholder.png",
-          price: Number(book.price) || 0,
+          title: book.title ?? item.title ?? "No title",
+          image: book.image ?? item.image ?? "/placeholder.png",
+          price:
+            Number(
+              (item.price ?? book.price)?.toString().replace(/[^\d.]/g, "")
+            ) || 0,
+          description: book.description ?? item.description ?? "",
+          category: book.category ?? item.category ?? "",
+          author: book.author ?? item.author ?? {},
+          published_date: book.published_date ?? item.published_date ?? "",
         };
       });
 
@@ -223,7 +254,11 @@ const useStore = create((set, get) => ({
           book_id: productId,
           title: product.title,
           image: product.image,
-          price: Number(product.price) || 0,
+          price: Number(product.price?.toString().replace(/[^\d.]/g, "")) || 0,
+          description: product.description || "",
+          category: product.category || "",
+          author: product.author || {},
+          published_date: product.published_date || "",
         },
       ];
       set({ wishlist: updatedWishlist, wishlistCount: updatedWishlist.length });
@@ -254,6 +289,17 @@ const useStore = create((set, get) => ({
     );
     set({ wishlist: updatedWishlist, wishlistCount: updatedWishlist.length });
     toast.success("Product removed from wishlist 💔");
+  },
+
+  clearWishlist: async () => {
+    const wishlist = get().wishlist;
+    try {
+      for (const item of wishlist) {
+        await get().removeFromWishlist(item.productId);
+      }
+    } catch (error) {
+      toast.error("Failed to clear wishlist ❌");
+    }
   },
 }));
 
