@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { booksAPI } from "../../services/apiService";
 import useStore from "../../store/store";
@@ -83,7 +83,7 @@ export default function ProductDetails() {
   const handleAddToCart = async () => {
     if (!product) return;
     try {
-      await addToCart(product);
+      await addToCart({ ...product, qty: quantity });
       setMessage("Product added to cart.");
       setTimeout(() => setMessage(""), 2500);
     } catch (err) {
@@ -238,11 +238,12 @@ export default function ProductDetails() {
 
             <div className="mt-4">
               <Link
-                to="/checkout"
+                to={`/checkout?buyNow=1&id=${product.id}`}
                 className="block w-3/4 text-center text-white bg-black border px-6 sm:px-7 text-base sm:text-lg py-3 rounded-md hover:bg-white hover:text-[#00bfc5] hover:border-[#00bfc5] transition-colors"
               >
                 Buy it now
               </Link>
+
               <p className="text-gray-600 italic mt-2 text-xs sm:text-sm">
                 Town blank name: nish; numbe: rdoke
               </p>

@@ -17,12 +17,11 @@ const useStore = create((set, get) => ({
     }
   },
 
- logout: () => {
-  sessionStorage.removeItem("token");
-  set({ token: null, isLoggedIn: false });
-  window.location.reload(); 
-},
-
+  logout: () => {
+    sessionStorage.removeItem("token");
+    set({ token: null, isLoggedIn: false });
+    window.location.reload();
+  },
 
   // 🔹 Products
   books: [],
@@ -127,6 +126,7 @@ const useStore = create((set, get) => ({
             ?.toString()
             .replace(/[^\d.]/g, "")
         ) || 0,
+      qty: product.qty || 1, // ← هنا الإضافة المهمة
     };
 
     try {

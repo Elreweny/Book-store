@@ -32,7 +32,6 @@ export default function WishlistPage() {
   const handleRemove = async (id) => {
     try {
       await removeFromWishlist(id);
-      toast.success("Removed from wishlist 💔");
     } catch {
       toast.error("Failed to remove from wishlist ❌");
     }

@@ -84,8 +84,10 @@ export const cartAPI = {
               ?.toString()
               .replace(/[^\d.]/g, "")
           ) || 0,
+        qty: product.qty || 1, // ← الإضافة المهمة
       })
       .then((res) => res.data.data),
+
   getAll: () => api.get("/cart"),
   update: (itemId, qty) => api.post(`/cart/${itemId}`, { qty }),
   remove: (itemId) => api.delete(`/cart/${itemId}`),
