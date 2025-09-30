@@ -1,0 +1,26 @@
+.swiper-pagination-bullet {
+  width: 20px;
+  height: 4px;
+  border-radius: 0;
+  color: white;
+  margin: 0 6px;
+  transition: background-color 0.3s ease;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #000 !important;
+}
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
