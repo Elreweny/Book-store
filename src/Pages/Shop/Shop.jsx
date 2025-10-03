@@ -20,7 +20,7 @@ export default function Shop() {
     prev: null,
     current: 1,
   });
-  const [ready, setReady] = useState(false); // ✅ لتأخير عرض المنتجات لحد ما البيانات توصل
+  const [ready, setReady] = useState(false); 
 
   // 🔹 Store
   const fetchCart = useStore((state) => state.fetchCart);
@@ -103,11 +103,11 @@ export default function Shop() {
 
   useEffect(() => {
     const loadData = async () => {
-      await fetchCart(); // ✅ جلب الكارت أولاً
-      await fetchWishlist(); // ✅ جلب الويش ليست
-      await fetchCategories(); // ✅ جلب الكاتيجوريز
-      await fetchProducts(1, filters); // ✅ جلب المنتجات
-      setReady(true); // ✅ السماح بعرض المنتجات
+      await fetchCart(); 
+      await fetchWishlist(); 
+      await fetchCategories(); 
+      await fetchProducts(1, filters);
+      setReady(true); 
     };
     loadData();
   }, []);

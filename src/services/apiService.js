@@ -21,20 +21,49 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+let lastErrorMessage = "";
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
-    if (status === 404) return Promise.reject(error);
-    const message =
+    const method = error?.config?.method?.toUpperCase();
+    const url = error?.config?.url;
+
+    let message =
       error?.response?.data?.message ||
       error?.response?.data?.error ||
       error.message ||
-      "حدث خطأ غير متوقع";
-    toast.error(message);
+      "An unexpected error occurred";
+
+   
+    if (message.includes("Attempt to read property")) {
+      return Promise.reject(error); 
+    }
+
+    if (status === 401) {
+      message = "Login to unlock your best shopping journey 🛒";
+
+      const isPassiveRequest =
+        method === "GET" &&
+        (url?.includes("/cart") ||
+         url?.includes("/wishlist/get") ||
+         url?.includes("/user"));
+
+      if (isPassiveRequest && message === lastErrorMessage) {
+        return Promise.reject(error);
+      }
+    }
+
+    if (message !== lastErrorMessage) {
+      toast.error(message);
+      lastErrorMessage = message;
+    }
+
     return Promise.reject(error);
   }
 );
+
 
 // Books API
 export const booksAPI = {
@@ -84,7 +113,7 @@ export const cartAPI = {
               ?.toString()
               .replace(/[^\d.]/g, "")
           ) || 0,
-        qty: product.qty || 1, // ← الإضافة المهمة
+        qty: product.qty || 1,
       })
       .then((res) => res.data.data),
 

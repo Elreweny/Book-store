@@ -14,7 +14,7 @@ export default function Header() {
   const [openCurrency, setOpenCurrency] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
 
-  // ✅ Zustand values
+  //  Zustand values
   const token = useStore((state) => state.token);
   const logout = useStore((state) => state.logout);
   const cartCount = useStore((state) => state.cartCount);
@@ -25,7 +25,7 @@ export default function Header() {
   const isLoggedIn = !!token;
   const navigate = useNavigate();
 
-  // ✅ sync cart + wishlist on refresh
+  //  sync cart + wishlist on refresh
   useEffect(() => {
     if (isLoggedIn) {
       fetchCart();
@@ -33,7 +33,7 @@ export default function Header() {
     }
   }, [isLoggedIn, fetchCart, fetchWishlist]);
 
-  // ✅ handle window resize
+  //  handle window resize
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 768);
     window.addEventListener("resize", handleResize);
@@ -114,7 +114,7 @@ export default function Header() {
 
           {/* Right side */}
           <div className="flex items-center gap-8">
-            {/* Wishlist with badge */}
+            
             <Link to="/wishlist" className="relative" aria-label="Wishlist">
               <FiHeart className="text-[18px] hover:text-[#00bfc5]" />
               {wishlistCount > 0 && (
@@ -124,7 +124,7 @@ export default function Header() {
               )}
             </Link>
 
-            {/* Cart with badge */}
+           
             <Link to="/cart" className="relative" aria-label="Cart">
               <SlHandbag className="text-[18px] hover:text-[#00bfc5]" />
               {cartCount > 0 && (

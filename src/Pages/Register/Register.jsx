@@ -38,11 +38,10 @@ export default function Register() {
         headers: { Accept: "application/json" },
       });
 
-      // ✅ استخراج التوكن من الاستجابة حسب شكلها
       const token = response.data?.data?.token;
       if (token) {
-        setToken(token); // ✅ تخزين التوكن في Zustand + sessionStorage
-        navigate("/");   // ✅ توجيه المستخدم بعد التسجيل
+        setToken(token);
+        navigate("/");
       } else {
         console.error("No token returned from API");
         alert("Registration succeeded but no token was returned!");
@@ -54,9 +53,7 @@ export default function Register() {
         "Registration failed";
       console.error(message);
       alert(
-        typeof message === "string"
-          ? message
-          : JSON.stringify(message, null, 2)
+        typeof message === "string" ? message : JSON.stringify(message, null, 2)
       );
     } finally {
       setSubmitting(false);
@@ -172,7 +169,10 @@ export default function Register() {
                   </div>
 
                   <div className="text-sm mt-4 text-center">
-                    <Link to="/login" className="text-[#00bfc5] hover:underline">
+                    <Link
+                      to="/login"
+                      className="text-[#00bfc5] hover:underline"
+                    >
                       Already have an account? Login
                     </Link>
                   </div>

@@ -3,7 +3,7 @@ import { booksAPI, cartAPI, wishlistAPI } from "../services/apiService";
 import toast from "react-hot-toast";
 
 const useStore = create((set, get) => ({
-  // 🔹 Auth
+  //  Auth
   token: sessionStorage.getItem("token") || null,
   isLoggedIn: !!sessionStorage.getItem("token"),
 
@@ -23,7 +23,7 @@ const useStore = create((set, get) => ({
     window.location.reload();
   },
 
-  // 🔹 Products
+  //  Products
   books: [],
   currentBook: null,
   loading: false,
@@ -62,7 +62,7 @@ const useStore = create((set, get) => ({
     }
   },
 
-  // 🔹 Cart
+  //  Cart
   cart: [],
   cartCount: 0,
   cartLoaded: false,
@@ -126,16 +126,14 @@ const useStore = create((set, get) => ({
             ?.toString()
             .replace(/[^\d.]/g, "")
         ) || 0,
-      qty: product.qty || 1, // ← هنا الإضافة المهمة
+      qty: product.qty || 1,
     };
 
     try {
       await cartAPI.add(preparedProduct);
       await get().fetchCart();
       toast.success("Product added to cart 🛒");
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to add product ❌");
-    }
+    } catch {}
   },
 
   removeFromCart: async (bookId) => {
@@ -148,9 +146,6 @@ const useStore = create((set, get) => ({
       await cartAPI.remove(targetItem.cartItemId);
     } catch (error) {
       if (error.response?.status !== 404) {
-        toast.error(
-          error.response?.data?.message || "Failed to remove product ❌"
-        );
       }
     }
 
@@ -159,7 +154,7 @@ const useStore = create((set, get) => ({
       (item) => item.cartItemId !== targetItem.cartItemId
     );
     set({ cart: updatedCart, cartCount: get().cartCount - removedQty });
-    toast.success("Product removed from cart 🗑️");
+    toast.success("Product removed from cart 🗑️"); 
   },
 
   updateCartItem: async (bookId, qty) => {
@@ -192,7 +187,7 @@ const useStore = create((set, get) => ({
     }
   },
 
-  // 🔹 Wishlist
+  // Wishlist
   wishlist: [],
   wishlistCount: 0,
   wishlistLoaded: false,
@@ -246,49 +241,28 @@ const useStore = create((set, get) => ({
 
     try {
       await wishlistAPI.add(product);
-      const updatedWishlist = [
-        ...wishlist,
-        {
-          productId,
-          id: productId,
-          book_id: productId,
-          title: product.title,
-          image: product.image,
-          price: Number(product.price?.toString().replace(/[^\d.]/g, "")) || 0,
-          description: product.description || "",
-          category: product.category || "",
-          author: product.author || {},
-          published_date: product.published_date || "",
-        },
-      ];
-      set({ wishlist: updatedWishlist, wishlistCount: updatedWishlist.length });
       toast.success("Product added to wishlist ❤️");
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to add product ❌");
-    }
+      await get().fetchWishlist();
+    } catch {}
   },
 
   removeFromWishlist: async (bookId) => {
     if (!bookId) return;
     const wishlist = get().wishlist;
     const targetItem = wishlist.find((item) => item.productId === bookId);
-    if (!targetItem || !targetItem.wishlistId) return;
+    if (!targetItem || !targetItem.wishlistId) {
+      await get().fetchWishlist();
+      return;
+    }
 
     try {
       await wishlistAPI.remove(targetItem.wishlistId);
+      toast.success("Product removed from wishlist 💔");
+      await get().fetchWishlist();
     } catch (error) {
       if (error.response?.status !== 404) {
-        toast.error(
-          error.response?.data?.message || "Failed to remove product ❌"
-        );
       }
     }
-
-    const updatedWishlist = wishlist.filter(
-      (item) => item.wishlistId !== targetItem.wishlistId
-    );
-    set({ wishlist: updatedWishlist, wishlistCount: updatedWishlist.length });
-    toast.success("Product removed from wishlist 💔");
   },
 
   clearWishlist: async () => {

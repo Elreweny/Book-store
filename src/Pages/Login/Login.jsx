@@ -23,11 +23,11 @@ export default function Login() {
         headers: { Accept: "application/json" },
       });
 
-      // ✅ استخراج التوكن من الاستجابة حسب شكلها
+      
       const token = response.data?.data?.token;
       if (token) {
-        setToken(token); // ✅ تخزين التوكن في Zustand + sessionStorage
-        navigate("/");   // ✅ توجيه المستخدم بعد تسجيل الدخول
+        setToken(token); 
+        navigate("/");   
       } else {
         console.error("No token returned from API");
         alert("Login failed: No token received");

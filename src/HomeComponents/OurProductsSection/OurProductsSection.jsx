@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { booksAPI } from "../../services/apiService";
 import ProductCard from "../../ShopComponents/ProductCard/ProductCard";
 import { Link } from "react-router-dom";
+import useStore from "../../store/store"; //
 
 export default function OurProductsSection() {
   const [categories, setCategories] = useState([]);
@@ -9,7 +10,16 @@ export default function OurProductsSection() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // 🔹 جلب التصنيفات
+  const fetchCart = useStore((state) => state.fetchCart);
+  const fetchWishlist = useStore((state) => state.fetchWishlist);
+  useEffect(() => {
+  fetchCart(); 
+  fetchWishlist(); 
+  fetchCategories(); 
+}, []);
+
+
+  //  جلب التصنيفات
   const fetchCategories = async () => {
     try {
       const catsRes = await fetch(
@@ -26,7 +36,7 @@ export default function OurProductsSection() {
     }
   };
 
-  // 🔹 جلب المنتجات حسب التصنيف
+  //  جلب المنتجات حسب التصنيف
   const fetchProducts = async (categoryName) => {
     setLoading(true);
     try {

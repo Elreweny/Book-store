@@ -1,5 +1,5 @@
 import { RouterProvider } from "react-router-dom";
-import { Toaster } from "react-hot-toast"; 
+import { Toaster } from "react-hot-toast";
 import router from "./Routes/Routes";
 import { useEffect } from "react";
 import useStore from "./store/store";
@@ -22,12 +22,14 @@ function App() {
       <Toaster
         position="top-center"
         toastOptions={{
-          duration: 2000,
+          duration: 3000,
           style: {
-            background: "#333",
-            color: "#fff",
-            fontSize: "15px",
+            background: "#d1fae5",
+            color: "#047857",
+            fontSize: "16px",
+            padding: "8px",
             borderRadius: "8px",
+            border: "1px solid #6EE7B7",
           },
         }}
       />
