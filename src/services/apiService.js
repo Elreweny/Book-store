@@ -36,9 +36,15 @@ api.interceptors.response.use(
       error.message ||
       "An unexpected error occurred";
 
-   
     if (message.includes("Attempt to read property")) {
-      return Promise.reject(error); 
+      const isUserAction = method !== "GET";
+
+      if (isUserAction) {
+        message = "Login to unlock your best shopping journey 🛒";
+      } else {
+        lastErrorMessage = "";
+        return Promise.reject(error);
+      }
     }
 
     if (status === 401) {
@@ -47,23 +53,26 @@ api.interceptors.response.use(
       const isPassiveRequest =
         method === "GET" &&
         (url?.includes("/cart") ||
-         url?.includes("/wishlist/get") ||
-         url?.includes("/user"));
+          url?.includes("/wishlist/get") ||
+          url?.includes("/user"));
 
-      if (isPassiveRequest && message === lastErrorMessage) {
-        return Promise.reject(error);
+      if (isPassiveRequest) {
+        if (message === lastErrorMessage) {
+          return Promise.reject(error);
+        }
+        lastErrorMessage = message;
       }
     }
 
-    if (message !== lastErrorMessage) {
-      toast.error(message);
-      lastErrorMessage = message;
+    toast.error(message);
+
+    if (method !== "GET") {
+      lastErrorMessage = "";
     }
 
     return Promise.reject(error);
   }
 );
-
 
 // Books API
 export const booksAPI = {
